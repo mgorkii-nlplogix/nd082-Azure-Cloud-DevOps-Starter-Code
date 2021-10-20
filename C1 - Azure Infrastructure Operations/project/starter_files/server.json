@@ -6,7 +6,7 @@
 	},
 	"builders": [{
 		"type": "azure-arm",
-		"managed_image_resource_group_name": "udemy-azure-test",
+		"managed_image_resource_group_name": "udemy-azure-packer",
 		"managed_image_name": "ubuntuImage",
 		"os_type": "Linux",
 		"image_publisher": "Canonical",
