@@ -32,13 +32,6 @@ variable "vm_number" {
   type        = number
 }
 
-variable packer_image_name {
-  description = "Number of VM resources created in load balancer"
-  default     = 3
-  type        = number
-}
-
-
 variable "admin_user" {
    description = "User name to use as the admin account on the VMs that will be part of the VM scale set"
    default     = "azureuser"
