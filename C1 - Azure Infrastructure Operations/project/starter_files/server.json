@@ -6,6 +6,9 @@
 	},
 	"builders": [{
 		"type": "azure-arm",
+		"client_id": "{{user `client_id`}}",
+        "client_secret": "{{user `client_secret`}}",
+        "subscription_id": "{{user `subscription_id`}}",
 		"managed_image_resource_group_name": "udemy-azure-packer",
 		"managed_image_name": "ubuntuImage",
 		"os_type": "Linux",
@@ -19,7 +22,7 @@
 		},
 	
 		"location": "East US",
-		"vm_size": "Standard_A2"
+		"vm_size": "Standard_B1ls"
 
 	}],
 	"provisioners": [{
