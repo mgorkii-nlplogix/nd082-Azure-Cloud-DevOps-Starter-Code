@@ -16,7 +16,7 @@ resource "azurerm_virtual_network" "main" {
   resource_group_name = azurerm_resource_group.main.name
 }
 
-resource "azurerm_subnet" "internal" {
+resource "azurerm_subnet" "main" {
   name                 = "internal"
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
@@ -44,7 +44,7 @@ resource "azurerm_network_security_group" "main" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "main" {
-  subnet_id                 = subnet.rg.id
+  subnet_id                 = azurerm_subnet.main.id
   network_security_group_id = azurerm_network_security_group.main.id
 }
 
@@ -92,11 +92,11 @@ resource "azurerm_lb_probe" "main" {
 resource "azurerm_lb_backend_address_pool" "main" {
   resource_group_name = azurerm_resource_group.main.name
   loadbalancer_id     = azurerm_lb.main.id
-  name                = "${var.resource_group_name_prefix}-lb-backend-pool"
+  name                = "${var.prefix}-lb-backend-pool"
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "main" {
-  count                   = var.num_of_vms
+  count                   = var.vm_number
   network_interface_id    = azurerm_network_interface.main[count.index].id
   ip_configuration_name   = "internal"
   backend_address_pool_id = azurerm_lb_backend_address_pool.main.id
@@ -125,18 +125,18 @@ data "azurerm_image" "image" {
 }
 
 resource "azurerm_availability_set" "main" {
-  name                        = "${var.resource_group_name_prefix}-aset"
+  name                        = "${var.prefix}-aset"
   location                    = azurerm_resource_group.main.location
   resource_group_name         = azurerm_resource_group.main.name
   platform_fault_domain_count = 2
 }
 
 #Create virtual machines using packer image
-resource "azurerm_linux_virtual_machine" "example" {
+resource "azurerm_linux_virtual_machine" "main" {
   count                           = var.vm_number
   name                            = "${var.prefix}-${count.index}-vm"
-  resource_group_name             = azurerm_resource_group.example.name
-  location                        = azurerm_resource_group.example.location
+  resource_group_name             = azurerm_resource_group.main.name
+  location                        = azurerm_resource_group.main.location
   size                            = "Standard_B1ls"
   admin_username                  = var.admin_user
   admin_password                  = var.admin_password
@@ -144,9 +144,6 @@ resource "azurerm_linux_virtual_machine" "example" {
   network_interface_ids = [element(azurerm_network_interface.main.*.id, count.index)]
   availability_set_id = azurerm_availability_set.main.id
 
-  storage_profile_image_reference {
-    id=data.azurerm_image.image.id
-  }
 
   os_disk {
     storage_account_type = "Standard_LRS"
